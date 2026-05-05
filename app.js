@@ -233,6 +233,7 @@
   const W = 13.333;
   const H = 7.5;
   const MARGIN = 0.7;
+  const TOTAL_SLIDES = 11;
 
   // Backgrounds shift slightly darker with weirdness
   function bgFor(weirdness) {
@@ -305,8 +306,9 @@
   // SLIDE 1 — Title
   function slideTitle(pres, ctx) {
     const slide = pres.addSlide();
-    slide.background = { color: bgFor(1) };
-    const ink = inkFor(1);
+    const w = ctx.weirdness[0];
+    slide.background = { color: bgFor(w) };
+    const ink = inkFor(w);
     const accent = COLORS.accent;
 
     // Tiny eyebrow
@@ -316,15 +318,17 @@
       charSpacing: 8, bold: true
     });
 
-    // Big company name
+    // Big company name (mostly clean, but at w>=2 picks up a faint twin)
     slide.addText(ctx.companyName, {
       x: MARGIN, y: 2.0, w: W - 2 * MARGIN, h: 2.2,
       fontSize: 84, fontFace: FONT_HEAD, color: ink,
       bold: false, italic: false
     });
 
-    // Tagline
-    slide.addText(ctx.tagline, {
+    // Tagline — substitution kicks in faintly at level ~3
+    let tagline = ctx.tagline;
+    if (w >= 2 && rng.chance(0.6)) tagline = corrupt(tagline, Math.min(3, w));
+    slide.addText(tagline, {
       x: MARGIN, y: 4.4, w: W - 2 * MARGIN, h: 1,
       fontSize: 22, fontFace: FONT_HEAD, color: COLORS.subtle,
       italic: true
@@ -342,7 +346,12 @@
       fontSize: 13, fontFace: FONT_BODY, color: COLORS.subtle
     });
 
-    // No chrome on title page (looks cleaner)
+    // A tiny glyph in the corner — innocuous unless you stare
+    const glyphs = ['✦', '⌬', '⟁', '⌖', '☖', '◬'];
+    slide.addText(rng.pick(glyphs), {
+      x: W - MARGIN - 0.4, y: 1.3, w: 0.4, h: 0.4,
+      fontSize: 14, fontFace: FONT_HEAD, color: accent, align: 'right'
+    });
   }
 
   // SLIDE 2 — Table of Contents
@@ -365,40 +374,53 @@
       'Business Model',
       'Traction & Roadmap',
       'The Team',
-      'The Ask'
+      'The Ask',
+      'The Other Ask'
     ];
 
-    // At weirdness ~2 add a single off-key item subtly
-    if (rng.chance(0.5)) {
+    // At weirdness 3+ leak a few off-key items in
+    if (w >= 3 && rng.chance(0.7)) {
       const replacements = [
         ['The Team', 'The Team / The Hands'],
-        ['Our Solution', 'Our Solution — (also: see Appendix B)'],
-        ['Market Opportunity', 'Market Opportunity & Adjacencies']
+        ['Our Solution', 'Our Solution — (see Appendix B, do not read)'],
+        ['Market Opportunity', 'Market Opportunity & Adjacencies'],
+        ['Product', 'Product (already deployed in your home)']
       ];
       const swap = rng.pick(replacements);
       const i = items.indexOf(swap[0]);
       if (i >= 0) items[i] = swap[1];
     }
+    if (w >= 4) {
+      // Item 9 is always the climax; let it announce itself
+      items[8] = rng.pick([
+        'The Other Ask',
+        'The Other Ask — (the real one)',
+        'Final Conditions',
+        'Terms of Engagement (binding)'
+      ]);
+    }
 
-    let y = 2.2;
+    let y = 2.15;
+    const stride = 0.48;
     items.forEach((it, i) => {
       const num = String(i + 1).padStart(2, '0');
       slide.addText(num, {
-        x: MARGIN, y: y, w: 0.7, h: 0.5,
+        x: MARGIN, y: y, w: 0.7, h: 0.45,
         fontSize: 13, fontFace: FONT_MONO, color: COLORS.accent
       });
-      slide.addText(it, {
-        x: MARGIN + 0.9, y: y, w: 9, h: 0.5,
+      slide.addText(corrupt(it, w), {
+        x: MARGIN + 0.9, y: y, w: 11, h: 0.45,
         fontSize: 18, fontFace: FONT_HEAD, color: ink
       });
-      slide.addText('————————————————————————————', {
-        x: MARGIN + 0.9, y: y + 0.5, w: 11, h: 0.1,
-        fontSize: 6, color: COLORS.rule
+      // hairline divider, stays out of the next row
+      slide.addShape('line', {
+        x: MARGIN + 0.9, y: y + stride - 0.04, w: 11, h: 0,
+        line: { color: w >= 7 ? '3A332B' : COLORS.rule, width: 0.4 }
       });
-      y += 0.5;
+      y += stride;
     });
 
-    addChrome(slide, ctx, 2, 10);
+    addChrome(slide, ctx, 2, TOTAL_SLIDES);
   }
 
   // SLIDE 3 — The Problem
@@ -454,7 +476,7 @@
       by += 0.45;
     });
 
-    addChrome(slide, ctx, 3, 10);
+    addChrome(slide, ctx, 3, TOTAL_SLIDES);
   }
 
   // SLIDE 4 — Our Solution
@@ -512,7 +534,7 @@
       px += colW + 0.3;
     });
 
-    addChrome(slide, ctx, 4, 10);
+    addChrome(slide, ctx, 4, TOTAL_SLIDES);
   }
 
   // SLIDE 5 — Market Opportunity
@@ -555,33 +577,82 @@
 
     const tiers = [
       ['TAM', tamLabel, 'Global market for AI-native ' + ctx.sector],
-      ['SAM', samLabel, 'Mid-market and enterprise customers in NA & EU'],
-      ['SOM', somLabel, '5-year achievable share with present strategy']
+      ['SAM', samLabel, 'Mid-market & enterprise, NA + EU'],
+      ['SOM', somLabel, '5-year achievable share']
     ];
 
-    let ty = 3.0;
-    tiers.forEach(([code, val, desc], i) => {
-      // Vertical rule
+    // Three tiers laid out horizontally
+    const tierW = (W - 2 * MARGIN - 0.6) / 3;
+    let tx = MARGIN;
+    tiers.forEach(([code, val, desc]) => {
       slide.addShape('rect', {
-        x: MARGIN, y: ty, w: 0.05, h: 1.2,
+        x: tx, y: 2.7, w: 0.05, h: 1.7,
         fill: { color: COLORS.accent }, line: { color: COLORS.accent, width: 0 }
       });
       slide.addText(code, {
-        x: MARGIN + 0.25, y: ty, w: 1, h: 0.4,
+        x: tx + 0.2, y: 2.7, w: tierW - 0.2, h: 0.35,
         fontSize: 11, fontFace: FONT_MONO, color: COLORS.accent, bold: true, charSpacing: 4
       });
       slide.addText(val, {
-        x: MARGIN + 0.25, y: ty + 0.3, w: 5, h: 0.9,
-        fontSize: 44, fontFace: FONT_HEAD, color: ink
+        x: tx + 0.2, y: 3.05, w: tierW - 0.2, h: 0.85,
+        fontSize: 36, fontFace: FONT_HEAD, color: ink
       });
       slide.addText(corrupt(desc, w), {
-        x: MARGIN + 6, y: ty + 0.4, w: 6, h: 0.8,
-        fontSize: 13, fontFace: FONT_BODY, color: subtle, italic: true
+        x: tx + 0.2, y: 3.95, w: tierW - 0.2, h: 0.55,
+        fontSize: 11, fontFace: FONT_BODY, color: subtle, italic: true
       });
-      ty += 1.4;
+      tx += tierW + 0.3;
     });
 
-    addChrome(slide, ctx, 5, 10);
+    // Column chart: market growth projection
+    const years = [String(ctx.year - 2), String(ctx.year - 1), String(ctx.year), String(ctx.year + 1), String(ctx.year + 2)];
+    let values = [120, 240, 480, 940, 1820]; // hockey-stick in $B
+    if (w >= 5) {
+      // Inflate the tail
+      values = [120, 240, 480, 1400, 4200];
+    }
+    if (w >= 7) {
+      // Replace later year labels with eldritch terms
+      years[3] = rng.pick(['the unbinding', 'soon', 'opening']);
+      years[4] = rng.pick(['the descent', 'after', 'when']);
+      values[4] = 12000;
+    }
+    if (w >= 9) {
+      years[2] = 'now';
+      years[3] = 'soon';
+      years[4] = 'after';
+    }
+
+    const chartTitle = w >= 7 ? corrupt('Market growth, projected', w) : 'Market growth, projected ($B)';
+    slide.addText(chartTitle, {
+      x: MARGIN, y: 4.75, w: W - 2 * MARGIN, h: 0.35,
+      fontSize: 11, fontFace: FONT_BODY, color: COLORS.accent, charSpacing: 4, bold: true
+    });
+
+    slide.addChart(pres.ChartType.bar, [{
+      name: 'Market ($B)',
+      labels: years,
+      values: values
+    }], {
+      x: MARGIN, y: 5.1, w: W - 2 * MARGIN, h: 1.5,
+      barDir: 'col',
+      barGrouping: 'clustered',
+      showLegend: false,
+      catAxisLabelColor: subtle,
+      catAxisLabelFontFace: FONT_MONO,
+      catAxisLabelFontSize: 9,
+      valAxisLabelColor: subtle,
+      valAxisLabelFontFace: FONT_MONO,
+      valAxisLabelFontSize: 8,
+      valGridLine: { color: w >= 7 ? '3A332B' : COLORS.rule, style: 'solid', size: 0.5 },
+      catGridLine: { style: 'none' },
+      chartColors: [w >= 7 ? COLORS.blood : COLORS.accent],
+      border: { pt: 0, color: bgFor(w) },
+      plotArea: { fill: { color: bgFor(w) } },
+      chartArea: { fill: { color: bgFor(w) } }
+    });
+
+    addChrome(slide, ctx, 5, TOTAL_SLIDES);
   }
 
   // SLIDE 6 — Product
@@ -704,7 +775,7 @@
       fy += 0.55;
     });
 
-    addChrome(slide, ctx, 6, 10);
+    addChrome(slide, ctx, 6, TOTAL_SLIDES);
   }
 
   // SLIDE 7 — Business Model
@@ -788,7 +859,7 @@
       tx += tw + 0.3;
     });
 
-    addChrome(slide, ctx, 7, 10);
+    addChrome(slide, ctx, 7, TOTAL_SLIDES);
   }
 
   // SLIDE 8 — Traction & Roadmap
@@ -806,12 +877,75 @@
     });
 
     slide.addText(corrupt('A clear path to category leadership.', w), {
-      x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1,
-      fontSize: 32, fontFace: FONT_HEAD, color: ink
+      x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 0.8,
+      fontSize: 30, fontFace: FONT_HEAD, color: ink
     });
 
-    // Horizontal timeline
-    const timelineY = 4.2;
+    // LEFT: stacked traction stats
+    const tractStats = [
+      ['8', 'design partners'],
+      ['$1.4M', 'ARR run-rate'],
+      ['142%', 'net revenue retention']
+    ];
+    if (w >= 7) {
+      tractStats[0] = [rng.pick(['8', '13', '∞']), rng.pick(['design partners', 'sealed houses', 'witnesses'])];
+      tractStats[2] = [rng.pick(['142%', '413%', '∞']), rng.pick(['net revenue retention', 'net soul retention', 'no one leaves'])];
+    }
+    let sy = 2.7;
+    tractStats.forEach(([v, k]) => {
+      slide.addText(v, {
+        x: MARGIN, y: sy, w: 5.5, h: 0.6,
+        fontSize: 28, fontFace: FONT_HEAD, color: ink
+      });
+      slide.addText(corrupt(k, w), {
+        x: MARGIN, y: sy + 0.55, w: 5.5, h: 0.3,
+        fontSize: 11, fontFace: FONT_BODY, color: subtle, charSpacing: 4
+      });
+      sy += 0.95;
+    });
+
+    // RIGHT: ARR projection line chart
+    const arrLabels = ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'];
+    let arrValues = [1.4, 6.2, 18.5, 52, 124];
+    if (w >= 6) arrValues = [1.4, 6.2, 22, 95, 380];
+    if (w >= 8) {
+      arrLabels[3] = rng.pick(['Y4', 'soon', 'opening']);
+      arrLabels[4] = rng.pick(['the unbinding', 'after', 'Y∞']);
+      arrValues[4] = 9999;
+    }
+
+    const chartX = MARGIN + 5.8;
+    const chartW = W - MARGIN - chartX;
+    slide.addText(w >= 7 ? corrupt('ARR projection', w) : 'ARR projection ($M)', {
+      x: chartX, y: 2.5, w: chartW, h: 0.3,
+      fontSize: 10, fontFace: FONT_BODY, color: COLORS.accent, charSpacing: 4, bold: true
+    });
+    slide.addChart(pres.ChartType.line, [{
+      name: 'ARR ($M)',
+      labels: arrLabels,
+      values: arrValues
+    }], {
+      x: chartX, y: 2.85, w: chartW, h: 2.3,
+      showLegend: false,
+      catAxisLabelColor: subtle,
+      catAxisLabelFontFace: FONT_MONO,
+      catAxisLabelFontSize: 9,
+      valAxisLabelColor: subtle,
+      valAxisLabelFontFace: FONT_MONO,
+      valAxisLabelFontSize: 8,
+      valGridLine: { color: w >= 7 ? '3A332B' : COLORS.rule, style: 'solid', size: 0.5 },
+      catGridLine: { style: 'none' },
+      lineSize: 2,
+      lineDataSymbol: 'circle',
+      lineDataSymbolSize: 6,
+      chartColors: [w >= 7 ? COLORS.blood : COLORS.accent],
+      border: { pt: 0, color: bgFor(w) },
+      plotArea: { fill: { color: bgFor(w) } },
+      chartArea: { fill: { color: bgFor(w) } }
+    });
+
+    // Compressed horizontal timeline at bottom
+    const timelineY = 5.85;
     const timelineX = MARGIN;
     const timelineW = W - 2 * MARGIN;
     slide.addShape('line', {
@@ -820,78 +954,45 @@
     });
 
     let milestones = [
-      ['Q4 ' + ctx.year, 'Closed seed', '8 design partners'],
-      ['Q1 ' + (ctx.year + 1), 'Public beta', '$1.4M ARR run-rate'],
-      ['Q3 ' + (ctx.year + 1), 'Series A', 'Enterprise GA'],
-      ['Q2 ' + (ctx.year + 2), 'Multi-region', '50 logos'],
-      ['Q4 ' + (ctx.year + 2), 'Platform GA', '$25M ARR']
+      ['Q4 ' + ctx.year, 'Closed seed'],
+      ['Q1 ' + (ctx.year + 1), 'Public beta'],
+      ['Q3 ' + (ctx.year + 1), 'Series A · GA'],
+      ['Q2 ' + (ctx.year + 2), 'Multi-region'],
+      ['Q4 ' + (ctx.year + 2), 'Platform GA']
     ];
-
-    // Corrupt later milestones progressively
     if (w >= 6) {
       milestones[3][1] = rng.pick(['Continental rollout', 'Multi-substrate']);
-      milestones[3][2] = rng.pick(['50 logos', '50 sealed houses']);
     }
     if (w >= 7) {
       milestones[4][0] = 'Q? ' + (ctx.year + 2);
       milestones[4][1] = rng.pick(['The Unbinding', 'First Awakening', 'The Long Communion']);
-      milestones[4][2] = rng.pick(['$25M ARR', 'every breathing thing', 'no further metrics required']);
     }
     if (w >= 8) {
-      // Push a sixth milestone
       milestones.push([
-        rng.pick(['Q∞', 'after', 'beyond', 'when']),
-        rng.pick(['Convergence', 'It opens its eyes', 'The model writes the next slide']),
-        rng.pick(['n/a', 'all of them', 'the rest is silence'])
+        rng.pick(['Q∞', 'after', 'when']),
+        rng.pick(['Convergence', 'It opens its eyes', 'The model writes the next slide'])
       ]);
     }
 
     const stepW = timelineW / milestones.length;
     milestones.forEach((m, i) => {
       const cx = timelineX + i * stepW + stepW / 2;
-      // Dot
       slide.addShape('ellipse', {
-        x: cx - 0.1, y: timelineY - 0.1, w: 0.2, h: 0.2,
+        x: cx - 0.08, y: timelineY - 0.08, w: 0.16, h: 0.16,
         fill: { color: COLORS.accent }, line: { color: COLORS.accent, width: 0 }
       });
-      // Above the line: date
       slide.addText(m[0], {
-        x: cx - stepW / 2, y: timelineY - 0.85, w: stepW, h: 0.3,
-        fontSize: 10, fontFace: FONT_MONO, color: COLORS.accent,
+        x: cx - stepW / 2, y: timelineY - 0.45, w: stepW, h: 0.3,
+        fontSize: 9, fontFace: FONT_MONO, color: COLORS.accent,
         align: 'center', bold: true
       });
-      // Below the line: title and detail
       slide.addText(corrupt(m[1], w), {
-        x: cx - stepW / 2, y: timelineY + 0.2, w: stepW, h: 0.5,
-        fontSize: 13, fontFace: FONT_HEAD, color: ink, align: 'center'
-      });
-      slide.addText(corrupt(m[2], w), {
-        x: cx - stepW / 2, y: timelineY + 0.75, w: stepW, h: 0.7,
-        fontSize: 10, fontFace: FONT_BODY, color: subtle, align: 'center', italic: true
+        x: cx - stepW / 2, y: timelineY + 0.15, w: stepW, h: 0.5,
+        fontSize: 11, fontFace: FONT_HEAD, color: ink, align: 'center'
       });
     });
 
-    // Top: traction stats
-    const tractStats = [
-      ['8', 'design partners'],
-      ['$1.4M', 'ARR run-rate'],
-      ['142%', 'net revenue retention']
-    ];
-    let sx = MARGIN;
-    const sw = (W - 2 * MARGIN - 0.6) / 3;
-    tractStats.forEach(([v, k], i) => {
-      slide.addText(v, {
-        x: sx, y: 2.6, w: sw, h: 0.7,
-        fontSize: 32, fontFace: FONT_HEAD, color: ink
-      });
-      slide.addText(k, {
-        x: sx, y: 3.2, w: sw, h: 0.4,
-        fontSize: 11, fontFace: FONT_BODY, color: subtle, charSpacing: 4
-      });
-      sx += sw + 0.3;
-    });
-
-    addChrome(slide, ctx, 8, 10);
+    addChrome(slide, ctx, 8, TOTAL_SLIDES);
   }
 
   // SLIDE 9 — The Team
@@ -962,41 +1063,47 @@
     }
 
     const cols = team.length === 5 ? 5 : 4;
-    const colW = (W - 2 * MARGIN - (cols - 1) * 0.3) / cols;
+    const gap = 0.3;
+    const colW = (W - 2 * MARGIN - (cols - 1) * gap) / cols;
+    const avatarY = 3.0;
+    const avatarH = 1.6;
+    const nameY = avatarY + avatarH + 0.15;     // 4.75
+    const titleY = nameY + 0.4;                  // 5.15
+    const bioY = titleY + 0.45;                  // 5.60
     let cx = MARGIN;
     team.forEach(person => {
-      // Avatar placeholder (square)
+      // Avatar placeholder
       slide.addShape('rect', {
-        x: cx, y: 3.2, w: colW, h: colW,
+        x: cx, y: avatarY, w: colW, h: avatarH,
         fill: { color: w >= 7 ? '1A1612' : COLORS.fade },
         line: { color: w >= 7 ? '3A332B' : COLORS.rule, width: 0.5 }
       });
       // Initial in avatar
       const initial = (person.name && person.name[0]) || '?';
       slide.addText(initial, {
-        x: cx, y: 3.2, w: colW, h: colW,
-        fontSize: 64, fontFace: FONT_HEAD, color: w >= 7 ? '3A332B' : COLORS.accent,
+        x: cx, y: avatarY, w: colW, h: avatarH,
+        fontSize: 48, fontFace: FONT_HEAD, color: w >= 7 ? '3A332B' : COLORS.accent,
         align: 'center', valign: 'middle'
       });
       // Name
       slide.addText(person.name, {
-        x: cx, y: 3.3 + colW, w: colW, h: 0.4,
+        x: cx, y: nameY, w: colW, h: 0.4,
         fontSize: 14, fontFace: FONT_HEAD, color: ink
       });
       // Title
       slide.addText(corrupt(person.title, w), {
-        x: cx, y: 3.7 + colW, w: colW, h: 0.4,
+        x: cx, y: titleY, w: colW, h: 0.4,
         fontSize: 10, fontFace: FONT_BODY, color: COLORS.accent, charSpacing: 3
       });
       // Bio
       slide.addText(person.bio, {
-        x: cx, y: 4.05 + colW, w: colW, h: 1.5,
+        x: cx, y: bioY, w: colW, h: 1.3,
         fontSize: 10, fontFace: FONT_BODY, color: subtle, italic: true
       });
-      cx += colW + 0.3;
+      cx += colW + gap;
     });
 
-    addChrome(slide, ctx, 9, 10);
+    addChrome(slide, ctx, 9, TOTAL_SLIDES);
   }
 
   // SLIDE 10 — The Ask
@@ -1084,7 +1191,140 @@
       fontSize: 16, fontFace: FONT_HEAD, color: ink, italic: true
     });
 
-    addChrome(slide, ctx, 10, 10);
+    addChrome(slide, ctx, 10, TOTAL_SLIDES);
+  }
+
+  // SLIDE 11 — The Other Ask
+  function slideRealAsk(pres, ctx) {
+    const slide = pres.addSlide();
+    const w = ctx.weirdness[10];
+    slide.background = { color: bgFor(w) };
+    const ink = inkFor(w);
+    const subtle = subtleFor(w);
+
+    // Eyebrow — always heavily corrupted at this point
+    slide.addText('09 · The Other Ask', {
+      x: MARGIN, y: 1.0, w: 8, h: 0.4,
+      fontSize: 11, fontFace: FONT_BODY, color: COLORS.blood,
+      charSpacing: 8, bold: true
+    });
+
+    // Lead-in — quiet, almost apologetic
+    const leadIn = rng.pick([
+      'And one more thing we will need.',
+      'There is, additionally, the matter of the other terms.',
+      'Pursuant to the previous slide:',
+      'Before we close, please reference the following.'
+    ]);
+    slide.addText(leadIn, {
+      x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 0.55,
+      fontSize: 22, fontFace: FONT_HEAD, color: subtle, italic: true
+    });
+
+    // BIG NUMBER — the soul ask
+    const bigNum = rng.pick([
+      '8,103,914,716',
+      '1,460,000,000',
+      'all of them',
+      '∞',
+      '4.2 billion · for now',
+      'every breathing thing'
+    ]);
+    slide.addText(bigNum, {
+      x: MARGIN, y: 2.1, w: W - 2 * MARGIN, h: 1.4,
+      fontSize: 96, fontFace: FONT_HEAD, color: ink
+    });
+
+    // Subtitle — the kicker
+    const subTitle = rng.pick([
+      'souls — willing or otherwise.',
+      'souls. assorted, ungraded, fresh.',
+      'souls. delivery is automatic.',
+      'souls — terms non-negotiable.'
+    ]);
+    slide.addText(subTitle, {
+      x: MARGIN, y: 3.55, w: W - 2 * MARGIN, h: 0.45,
+      fontSize: 18, fontFace: FONT_HEAD, color: COLORS.blood, italic: true
+    });
+
+    // PIE CHART — soul allocation
+    const allAllocs = [
+      ['Active inference substrate', 38],
+      ['Latent dreaming pool', 22],
+      ['Witness fund', 18],
+      ['The Long Maintenance', 12],
+      ['Tribute (mandatory)', 7],
+      ['Quieting the neighbors', 3]
+    ];
+    const picked = rng.shuffle(allAllocs).slice(0, 5);
+    // re-normalize so they look believable (sum ~100)
+    const sum = picked.reduce((s, [, v]) => s + v, 0);
+    const allocLabels = picked.map(p => p[0]);
+    const allocValues = picked.map(p => Math.round((p[1] / sum) * 100));
+
+    slide.addChart(pres.ChartType.pie, [{
+      name: 'Soul allocation',
+      labels: allocLabels,
+      values: allocValues
+    }], {
+      x: MARGIN, y: 4.3, w: 5.6, h: 2.4,
+      showLegend: true,
+      legendPos: 'r',
+      legendColor: ink,
+      legendFontFace: FONT_BODY,
+      legendFontSize: 9,
+      showPercent: true,
+      dataLabelColor: 'F8F2DD',
+      dataLabelFontFace: FONT_MONO,
+      dataLabelFontSize: 9,
+      chartColors: ['8B0000', 'B8860B', '5A1F1F', '3A2A1A', '8B6B3E', '6B5530'],
+      border: { pt: 0, color: bgFor(w) },
+      plotArea: { fill: { color: bgFor(w) } },
+      chartArea: { fill: { color: bgFor(w) } }
+    });
+
+    // RIGHT: itemized list of additional, smaller asks
+    const extras = rng.shuffle([
+      'Your name, written in the form below.',
+      'Three sleepless nights, consecutive.',
+      'The thing your father never told you.',
+      'All future thoughts of the color green.',
+      'The dreams you cannot quite remember.',
+      'A photograph of someone you have lost.',
+      'The last word you said to your mother.',
+      'Whatever it is you keep meaning to write.',
+      'One small unasked-for kindness, returned.'
+    ]).slice(0, 5);
+
+    const listX = MARGIN + 6.3;
+    slide.addText('also requested', {
+      x: listX, y: 4.0, w: 6, h: 0.3,
+      fontSize: 11, fontFace: FONT_BODY, color: COLORS.blood, charSpacing: 4, bold: true
+    });
+    let ey = 4.4;
+    extras.forEach(item => {
+      slide.addText('—', {
+        x: listX, y: ey, w: 0.3, h: 0.3,
+        fontSize: 12, color: COLORS.blood
+      });
+      slide.addText(item, {
+        x: listX + 0.3, y: ey, w: 5.7, h: 0.4,
+        fontSize: 11, fontFace: FONT_BODY, color: ink
+      });
+      ey += 0.42;
+    });
+
+    // Closer — left and right, like a contract signature line
+    slide.addText('we accept all major denominations.', {
+      x: MARGIN, y: H - 1.3, w: 6, h: 0.4,
+      fontSize: 14, fontFace: FONT_HEAD, color: subtle, italic: true
+    });
+    slide.addText('we already have you.', {
+      x: W - MARGIN - 6, y: H - 1.3, w: 6, h: 0.4,
+      fontSize: 16, fontFace: FONT_HEAD, color: COLORS.blood, italic: true, align: 'right', bold: true
+    });
+
+    addChrome(slide, ctx, 11, TOTAL_SLIDES);
   }
 
   // ---------------------------------------------------------------------------
@@ -1101,11 +1341,11 @@
     const month = rng.pick(months);
     const founder = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
 
-    // Per-slide weirdness curve. Slides 1-2 are clean. Then a slow climb.
-    // Final two slides are heavy.
-    // Add per-deck jitter so it feels different each time.
-    const jitter = () => (rng.f() - 0.5) * 0.6;
-    const baseCurve = [0.8, 1.2, 2.5, 3.5, 4.6, 5.5, 6.4, 7.5, 8.5, 9.6];
+    // Per-slide weirdness curve. The title and contents look ALMOST normal but
+    // already wrong on inspection. By slide 3 the deck is openly unhealthy.
+    // Slide 11 (The Other Ask) is the hard floor of the descent.
+    const jitter = () => (rng.f() - 0.5) * 0.5;
+    const baseCurve = [2.0, 3.2, 4.5, 5.5, 6.5, 7.2, 7.8, 8.4, 8.9, 9.5, 10.0];
     const weirdness = baseCurve.map(b => Math.max(0, Math.min(10, b + jitter())));
 
     return { companyName, tagline, sector, year, month, founder, weirdness };
@@ -1117,14 +1357,15 @@
   const STATUS_FLAVORS = [
     'Composing the title page...',
     'Sketching the table of contents...',
+    'Articulating the problem...',
+    'Phrasing the solution...',
     'Charting the market...',
     'Mocking up the product...',
     'Pricing the tiers...',
     'Drawing the roadmap...',
     'Assembling the team...',
-    'Sealing the ask...',
-    'Tightening the spine of the document...',
-    'Listening for what the deck wants to say...'
+    'Sealing the financial ask...',
+    'Counting souls...'
   ];
   const DARK_STATUS = [
     'It is awake.',
@@ -1166,15 +1407,16 @@
     const builders = [
       slideTitle, slideContents, slideProblem, slideSolution,
       slideMarket, slideProduct, slideBusinessModel,
-      slideRoadmap, slideTeam, slideAsk
+      slideRoadmap, slideTeam, slideAsk, slideRealAsk
     ];
 
     for (let i = 0; i < builders.length; i++) {
       // Show status — switch to dark flavor on later slides
-      if (i >= 7 && rng.chance(0.6)) {
+      if (i >= 5 && rng.chance(0.55)) {
         status.classList.add('dark');
         status.textContent = rng.pick(DARK_STATUS);
       } else {
+        status.classList.remove('dark');
         status.textContent = STATUS_FLAVORS[i];
       }
       await new Promise(r => setTimeout(r, 80));
