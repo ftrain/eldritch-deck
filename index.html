@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucid Ventures &mdash; AI Pitch Deck Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+  :root{
+    --bg:#0b0b0f;
+    --fg:#e8e6df;
+    --muted:#8a8676;
+    --accent:#c9a96e;
+    --accent2:#7b3a3a;
+    --card:#13131a;
+    --line:#22222c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:'Inter',-apple-system,sans-serif;min-height:100vh}
+  body{
+    background:
+      radial-gradient(ellipse at top, rgba(123,58,58,0.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(201,169,110,0.05), transparent 50%),
+      var(--bg);
+  }
+  .nav{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:24px 48px;border-bottom:1px solid var(--line);
+  }
+  .logo{font-family:'Fraunces',serif;font-weight:800;font-size:22px;letter-spacing:-0.02em}
+  .logo .dot{color:var(--accent)}
+  .nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted)}
+  .nav-links a{color:inherit;text-decoration:none;transition:color .2s}
+  .nav-links a:hover{color:var(--fg)}
+  .hero{
+    max-width:1100px;margin:0 auto;padding:96px 48px 48px;text-align:center;
+  }
+  .eyebrow{
+    display:inline-block;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;
+    color:var(--accent);padding:6px 14px;border:1px solid rgba(201,169,110,0.3);
+    border-radius:999px;margin-bottom:32px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:800;font-size:clamp(40px,7vw,84px);
+    line-height:1.05;letter-spacing:-0.03em;margin:0 0 24px;
+  }
+  h1 em{font-style:italic;color:var(--accent);font-weight:400}
+  .lede{
+    font-size:20px;line-height:1.6;color:var(--muted);max-width:680px;margin:0 auto 48px;
+  }
+  .cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  button.primary{
+    background:var(--fg);color:var(--bg);border:none;padding:18px 36px;
+    font-size:15px;font-weight:600;font-family:inherit;letter-spacing:0.02em;
+    border-radius:6px;cursor:pointer;transition:all .2s;
+  }
+  button.primary:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(201,169,110,0.15)}
+  button.primary:disabled{opacity:0.6;cursor:wait}
+  button.ghost{
+    background:transparent;color:var(--fg);border:1px solid var(--line);padding:18px 28px;
+    font-size:15px;font-weight:500;font-family:inherit;border-radius:6px;cursor:pointer;
+    transition:all .2s;
+  }
+  button.ghost:hover{border-color:var(--muted)}
+  .features{
+    max-width:1100px;margin:0 auto;padding:64px 48px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  }
+  @media(max-width:780px){.features{grid-template-columns:1fr}.nav{padding:16px 24px}.hero{padding:48px 24px}.features{padding:32px 24px}}
+  .feat{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:32px;
+  }
+  .feat .icon{
+    width:36px;height:36px;border-radius:8px;
+    background:linear-gradient(135deg,rgba(201,169,110,0.15),rgba(123,58,58,0.15));
+    display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+    font-family:'Fraunces',serif;color:var(--accent);font-size:18px;font-weight:600;
+  }
+  .feat h3{margin:0 0 8px;font-size:16px;font-weight:600;letter-spacing:-0.01em}
+  .feat p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+  .status{
+    margin:32px auto 0;max-width:680px;min-height:24px;color:var(--muted);font-size:14px;
+    font-family:'JetBrains Mono',ui-monospace,monospace;text-align:center;
+  }
+  .status.working{color:var(--accent)}
+  .status.dark{color:var(--accent2);font-style:italic;letter-spacing:0.02em}
+  footer{
+    margin-top:96px;padding:32px 48px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:13px;text-align:center;
+  }
+  footer .tagline{font-style:italic;opacity:0.6;margin-top:8px;font-size:12px}
+  .glitch{position:relative;display:inline-block;animation:glitch-skew 1s infinite alternate-reverse}
+  @keyframes glitch-skew{0%{transform:skew(0deg)}100%{transform:skew(0.3deg)}}
+  .seed-input{
+    background:var(--card);border:1px solid var(--line);color:var(--fg);
+    padding:18px 16px;font-size:14px;border-radius:6px;font-family:'JetBrains Mono',monospace;
+    width:200px;
+  }
+  .seed-input:focus{outline:none;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="logo">Lucid<span class="dot">.</span>Ventures</div>
+  <div class="nav-links">
+    <a href="#">Portfolio</a>
+    <a href="#">Thesis</a>
+    <a href="#">Founders</a>
+    <a href="#">Contact</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="eyebrow">Generative Pitch Studio &middot; v1.0</span>
+  <h1>Generate a <em>compelling</em><br>AI startup pitch deck.</h1>
+  <p class="lede">
+    Lucid Ventures' proprietary deck composer assembles a complete ten-slide
+    Series&nbsp;A pitch in seconds. Each deck is procedurally unique. Drop the
+    .pptx into Keynote or PowerPoint and present immediately.
+  </p>
+  <div class="cta-row">
+    <input type="text" class="seed-input" id="seed" placeholder="seed (optional)" />
+    <button class="primary" id="generate">Generate Deck &rarr;</button>
+    <button class="ghost" id="regenerate">Roll Again</button>
+  </div>
+  <div class="status" id="status"></div>
+</section>
+
+<section class="features">
+  <div class="feat">
+    <div class="icon">I</div>
+    <h3>Investor-Ready Templates</h3>
+    <p>Calibrated against 412 funded decks. Title, problem, solution, market, product, business model, team, traction, ask.</p>
+  </div>
+  <div class="feat">
+    <div class="icon">II</div>
+    <h3>Procedural Narrative</h3>
+    <p>Every run pulls from a deep latent space of company concepts. No two decks alike. Always plausible. Always&hellip; coherent.</p>
+  </div>
+  <div class="feat">
+    <div class="icon">III</div>
+    <h3>Local Generation</h3>
+    <p>Runs entirely in your browser. Your decks never leave your machine. Nothing is logged. Nothing is watching.</p>
+  </div>
+</section>
+
+<footer>
+  &copy; Lucid Ventures &middot; A wholly-owned subsidiary of N&#x0303;y&#x0301;arl&#x0301;atho&#x0303;tep Holdings, LLC
+  <div class="tagline">that is not dead which can eternal pitch</div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
