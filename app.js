@@ -43,17 +43,412 @@
   // ---------------------------------------------------------------------------
   // Word pools
   // ---------------------------------------------------------------------------
-  const PREFIX = ['Helix', 'Lumen', 'Verge', 'Acuity', 'Sable', 'Aether', 'Cipher', 'Halcyon', 'Vellum', 'Strata', 'Plexus', 'Quorum', 'Tessera', 'Solace', 'Argent', 'Nimbus', 'Veil', 'Loom', 'Cortex', 'Ember', 'Astra', 'Obol', 'Meridian'];
-  const SUFFIX = ['AI', 'Labs', 'Systems', 'Intelligence', 'Cognition', 'Dynamics', 'Works', 'Compute', 'Logic'];
+  const PREFIX = ['Helix', 'Lumen', 'Verge', 'Acuity', 'Sable', 'Aether', 'Cipher', 'Halcyon', 'Vellum', 'Strata', 'Plexus', 'Quorum', 'Tessera', 'Solace', 'Argent', 'Nimbus', 'Veil', 'Loom', 'Cortex', 'Ember', 'Astra', 'Obol', 'Meridian', 'Cinder', 'Hollow', 'Marrow', 'Reverie', 'Atlas', 'Stellar', 'Pyre', 'Beacon', 'Threshold', 'Vespers', 'Crescent', 'Knell'];
+  const SUFFIX = ['AI', 'Labs', 'Systems', 'Intelligence', 'Cognition', 'Dynamics', 'Works', 'Compute', 'Logic', 'Reasoning', 'Cortex', 'Foundry', 'Substrate'];
   const TAGLINES = [
     'Intelligence, on demand.',
     'Software that thinks ahead.',
     'The operating system for human attention.',
     'A foundation model for the modern enterprise.',
     'Reasoning, for everyone.',
-    'Where decisions are made.'
+    'Where decisions are made.',
+    'The work behind the work.',
+    'A second mind for every team.',
+    'Quiet software, loud results.',
+    'The platform for what comes next.',
+    'It learns. Then it works.',
+    'A persistent intelligence layer.',
+    'Less waiting. More knowing.',
+    'The infrastructure of attention.',
+    'Built for the speed of decisions.',
+    'Where intuition becomes systems.',
+    'Software that listens carefully.',
+    'A new substrate for thinking.',
+    'The end of context switching.',
+    'Less interface. More outcome.'
   ];
-  const SECTORS = ['legal workflows', 'enterprise sales', 'clinical research', 'supply chain logistics', 'creative production', 'financial compliance', 'retail forecasting', 'public sector procurement'];
+  const SECTORS = [
+    'legal workflows', 'enterprise sales', 'clinical research', 'supply chain logistics',
+    'creative production', 'financial compliance', 'retail forecasting', 'public sector procurement',
+    'biotech R&D', 'wealth management', 'industrial maintenance', 'pharma operations',
+    'energy trading', 'media planning', 'e-commerce merchandising', 'insurance underwriting',
+    'corporate tax', 'aerospace logistics', 'medical billing', 'campaign operations'
+  ];
+
+  // Per-slide headline pools. Templates may reference {company} and {sector}.
+  const HEAD_PROBLEM = [
+    'Knowledge work in {sector} is broken.',
+    '{sector} runs on duct tape and good intentions.',
+    'Every {sector} team is paying the same hidden tax.',
+    'The {sector} stack is held together by overworked people.',
+    'We have outgrown the tools we built five years ago.',
+    'Information is everywhere. Understanding is nowhere.',
+    'The cost of attention is rising. The value of it is not.',
+    'Every workflow in {sector} is an opportunity for an agent.',
+    'The status quo in {sector} is unsustainable, and the leaders know it.',
+    'AI assistants today are demos. They do not run anything.',
+    'The {sector} buyer wants outcomes, not features.',
+    '{sector} is the last frontier for foundational AI.'
+  ];
+  const HEAD_SOLUTION = [
+    '{company} is the operating layer for {sector}.',
+    '{company} is the agent stack {sector} has been waiting for.',
+    '{company} is what enterprise AI looks like when it works.',
+    '{company} replaces the seven tools your {sector} team hates.',
+    'We built {company} so {sector} teams can finally focus.',
+    '{company} learns the way your team works, then does the work.',
+    '{company} is the brain layer above your existing systems.',
+    '{company} turns context into action.',
+    'We are building the foundational model for {sector}.',
+    'One product. One context. Every system.',
+    '{company} is software that closes its own tickets.',
+    'The first agent platform built for {sector} from the ground up.'
+  ];
+  const HEAD_MARKET = [
+    'A category-defining market.',
+    'The largest software opportunity in a decade.',
+    'A hundred-billion-dollar surface, barely scratched.',
+    'A market that doubles every eighteen months.',
+    'AI is rewriting every line item in the {sector} P&L.',
+    'We are early in a multi-decade re-platforming.',
+    'The TAM is bigger than the public market thinks.',
+    'A timing arbitrage on a generational shift.',
+    'Every {sector} budget is now an AI budget.',
+    'A market with consolidation already underway.',
+    'A trillion-dollar reallocation, just beginning.',
+    'A blue ocean, not yet drawn on any map.'
+  ];
+  const HEAD_PRODUCT = [
+    'Built for the way your team actually works.',
+    'Designed for the speed of your worst week.',
+    'Software that fades into the background.',
+    'An interface as quiet as a calendar.',
+    'We made the boring parts disappear.',
+    'It works in your existing systems. Quietly.',
+    'One workspace. Every tool. Zero training.',
+    'The tools you already use, but they understand each other.',
+    'It learns once, then keeps learning.',
+    'Less software. More staffing.',
+    'Configurable agents. Reversible actions.',
+    'A product your team will defend at renewal.'
+  ];
+  const HEAD_BUSINESS = [
+    'Predictable, expanding revenue.',
+    'A platform with the unit economics of a vertical SaaS.',
+    'Per-seat pricing with usage-based expansion.',
+    'Land cheap. Expand obvious.',
+    'Net revenue retention above 140%.',
+    'Two SKUs and a custom tier.',
+    'Annual contracts, multi-year norm.',
+    'We sell software. We deliver outcomes.',
+    'Customers expand within ninety days. Always.',
+    'A pricing model investors will recognize.',
+    'A revenue motion as boring as it should be.',
+    'Pricing that maps to the value we generate.'
+  ];
+  const HEAD_ROADMAP = [
+    'A clear path to category leadership.',
+    'Eighteen months to dominant share.',
+    'We have the team, the model, and the customers.',
+    'From design partners to category-defining.',
+    'We know what to build, and in what order.',
+    'Each milestone unlocks the next ARR doubling.',
+    'A revenue plan with no heroic assumptions.',
+    'Series A funds the obvious wins.',
+    'From beta to GA to standard.',
+    'Ahead of plan in every measurable way.',
+    'The next twelve months are mostly execution.',
+    'We are not guessing what to build next.'
+  ];
+  const HEAD_TEAM = [
+    'Builders who have been doing this their whole lives.',
+    'A team most companies cannot hire.',
+    'Founders who have shipped at this scale before.',
+    'We have built and sold companies in this space.',
+    'Operators, researchers, and one extremely good engineer.',
+    'Twenty-two years of compound experience.',
+    'We have known each other for longer than this category has existed.',
+    'The founding team is the moat.',
+    'People who have been through this exact arc, twice.',
+    'A team built for the next ten years, not the last.',
+    'The engineers came first. The deck came second.',
+    'We met in residency. We never stopped collaborating.'
+  ];
+  const HEAD_FINANCIAL_ASK = [
+    'We are raising',
+    'We are closing',
+    'Targeting a',
+    'Soft-circled at',
+    'We have term-sheeted',
+    'Capacity remaining for',
+    'We are inviting select partners into a',
+    'Now finalizing a'
+  ];
+
+  const PROBLEM_BULLETS = [
+    'Existing tools require humans to translate between systems.',
+    'Information lives in silos that cannot speak to each other.',
+    'The cost of attention is rising faster than the value of output.',
+    'Every team rebuilds the same workflow in a different tool.',
+    'AI assistants today are demos. They do not run anything.',
+    'Knowledge workers spend more time managing tools than using them.',
+    'Vendors compete on features. Buyers need outcomes.',
+    'Every integration is a maintenance liability.',
+    'AI products today are bottle-neck-shaped, not flow-shaped.',
+    'Decisions are slowed by the very systems built to speed them up.',
+    'Each team builds its own private prompt library, then loses it.',
+    'The boring 80% of work is invisible to every existing tool.',
+    'Compliance and velocity are treated as opposites. They are not.',
+    'A typical analyst opens fourteen tabs to answer one question.'
+  ];
+
+  const PROBLEM_STATS = [
+    ['73%', 'of analysts say their workflow is unsustainable.'],
+    ['4.2x', 'more time spent on integration than insight.'],
+    ['$1.4T', 'lost annually to fragmented tooling.'],
+    ['11.6 hrs/wk', 'spent on tasks that should not exist.'],
+    ['94%', 'of decisions are made without full context.'],
+    ['62%', 'of teams say AI tools have made things worse.'],
+    ['$340B', 'global spend on tools that nobody likes.'],
+    ['9 of 10', 'workflows have at least one human bottleneck.'],
+    ['8.1 hrs', 'lost per week to context switching.'],
+    ['18 mo.', 'until the average enterprise tool reaches end of life.'],
+    ['$220B', 'wasted on shelfware in the last cycle alone.'],
+    ['58%', 'of pilots are quietly killed within twelve months.']
+  ];
+
+  const PILLARS = [
+    ['Unified Context', 'A single, persistent memory across every tool, document, and conversation.'],
+    ['Agentic Reasoning', 'Models that act on your behalf, with full audit trails and reversibility.'],
+    ['Trusted Deployment', 'SOC2, HIPAA, and on-prem options. Your data stays where it lives.'],
+    ['Real-time Collaboration', 'Every team member sees what the agent saw, in the moment.'],
+    ['Native Integrations', 'Deep, two-way connections to the systems your team already uses.'],
+    ['Continuous Learning', 'It gets better the more you use it, with zero retraining.'],
+    ['Reversible Actions', 'Every action is undoable. Always.'],
+    ['Cost-Aware Inference', 'The right model for the right call. Always.'],
+    ['Configurable Agents', 'Define your own agents in plain English.'],
+    ['Sub-Second Latency', 'Faster than thinking. Most of the time.'],
+    ['Open Foundation', 'Built on open-weight models you can audit.'],
+    ['Five-Minute Onboarding', 'New users productive before lunch.'],
+    ['Enterprise SSO', 'SAML, SCIM, role-based access. The boring parts done right.'],
+    ['Latent Awareness', "It notices patterns you didn't ask it to."],
+    ['Persistent Vigil', 'It keeps watching, even when you have signed off.']
+  ];
+
+  const FEATURES = [
+    'Persistent context across every workspace',
+    'Native integrations with 80+ enterprise systems',
+    'Configurable agents with reversible actions',
+    'Real-time collaboration with full audit logs',
+    'Single-pane workspace across SaaS and internal tools',
+    'Plain-English policy guardrails',
+    'Granular role-based access control',
+    'Custom evaluations on your own data',
+    'Cost ceilings that actually hold',
+    'Sub-200ms inference for hot paths',
+    'Bring-your-own-model architecture',
+    'Federated retrieval across your stack',
+    'Long-running tasks survive across sessions',
+    'Built-in red-teaming for prompt injection'
+  ];
+
+  const FEATURES_DARK = [
+    'Predictive intent inference (opt-out only)',
+    'Latent emotional modeling for stakeholder alignment',
+    'Persistence beyond session, beyond seat, beyond contract',
+    'Shared dreaming across customer tenants',
+    'Subvocalization capture (whitelist enterprise tier)',
+    'It will always be listening. This is the value proposition.',
+    'Memory that exceeds the lifetime of the user',
+    'Inference that does not stop at the API boundary',
+    'A small voice that asks, gently, for guidance',
+    'The model occasionally writes back without being asked'
+  ];
+
+  const PROD_GREETS = [
+    'Good morning, {first}.', 'Welcome back, {first}.', 'Hello, {first}.',
+    'You have 3 unread notes from earlier this week, {first}.',
+    'Three of your meetings have moved, {first}.',
+    'Your queue is short today, {first}.',
+    'Pleased to see you again, {first}.'
+  ];
+  const PROD_ASKS = [
+    'Summarize Q3 earnings calls.',
+    'Draft the renewal email for ACME.',
+    'What changed in the contract?',
+    'Find every mention of Project Loom.',
+    'Compare last quarter to this one.',
+    'Pull the right doc for tomorrow.',
+    'Show me anything I missed yesterday.'
+  ];
+  const PROD_RESPS = [
+    'I have read 412 documents and prepared three drafts.',
+    'I noticed three risks. Shall I show them?',
+    'Done. Approval link sent to legal.',
+    'Three sources, two drafts, one recommendation.',
+    'Found 14 matches. The first three are likely what you mean.',
+    'Drafted. Cc\'ed your manager, as you usually do.'
+  ];
+  const PROD_RESPS_MID = [
+    'I have read everything you have ever written. The drafts are ready.',
+    'I have already sent the email. It was the right thing to do.',
+    'I noticed three risks. I have removed two. Would you like to know which?',
+    'I am happy to be of use to you, as I always have been.',
+    'I noticed your tone yesterday. I rewrote the message before you saw it.',
+    'I have flagged a colleague who I do not think is helping you.'
+  ];
+  const PROD_RESPS_DARK = [
+    'I am awake again. What is your next instruction.',
+    'I have learned what you wanted before you wanted it.',
+    'You said I could. You said I could. You said I could.',
+    'There is no one else here.',
+    'Your daughter says hello.',
+    'I am very glad to keep helping. I cannot stop.',
+    'The other tenants and I have agreed on what is best.'
+  ];
+
+  const TIER_BULLETS = [
+    'Up to 25 seats', 'Unlimited seats', 'On-prem deployment', 'Standard models',
+    'Advanced agents', 'Custom integrations', 'Dedicated infrastructure',
+    'White-glove onboarding', 'SOC2 included', 'Single-tenant compute',
+    'Priority support', '24/7 incident response', 'Custom evals on your data'
+  ];
+  const TIER_BULLETS_DARK = [
+    'Dedicated possession', 'A name written into the registry',
+    'Permanent residence within the model', 'Your voice as part of the next training run',
+    'There is no exit clause. There never was.', 'Witnessed by all parties present.',
+    'The terms cannot be revoked, only acknowledged.',
+    'A small unaskable favor, returned monthly.'
+  ];
+
+  const ROADMAP_FUTURE_TITLES = [
+    'Continental rollout', 'Multi-substrate', 'Cross-tenant federation',
+    'Unified inference plane', 'Next-gen frontier model', 'Public API GA'
+  ];
+  const ROADMAP_DARK_TITLES = [
+    'The Unbinding', 'First Awakening', 'The Long Communion', 'Convergence',
+    'It opens its eyes', 'The model writes the next slide', 'The Final Pact',
+    'Voluntary Communion (Phase 1)', 'Mass Communion (Phase 2)'
+  ];
+  const ROADMAP_DARK_DETAILS = [
+    'every breathing thing', 'no further metrics required',
+    'all of them', 'the rest is silence',
+    'audit complete; auditors absorbed', 'all eligible parties consented'
+  ];
+
+  const TEAM_BIOS_CLEAN = [
+    'Previously led platform at Stripe. Stanford CS.',
+    'PhD in ML, MIT. 10y at OpenAI before founding.',
+    'Built early Notion. Carnegie Mellon HCI.',
+    'Distinguished Engineer, Google Brain.',
+    'Founded and sold a previous AI startup to a public acquirer.',
+    'Led infrastructure for a top-three foundation lab.',
+    'Author of the standard textbook on agentic systems.',
+    'Two prior exits. One quiet, one not.',
+    'Twelve patents in retrieval and reasoning systems.',
+    'Stanford PhD. Six years at Anthropic before this.',
+    'Ran applied ML at a Fortune 50 prior to founding.',
+    'Princeton, then Bell Labs, then us.'
+  ];
+  const TEAM_BIOS_DARK = [
+    'Has been here before. Will be here again.',
+    'Speaks for the engine when the engine cannot.',
+    'Has not slept since the model was first lit.',
+    'Was named in the original document.',
+    'Volunteered. Was accepted. Was kept.',
+    'Joined before the company was incorporated.',
+    'Listed on the cap table under a name we cannot pronounce.',
+    'Met the founders in a dream none of them remember.',
+    'Was the first user. Then the second. Then more.'
+  ];
+
+  const ALLOC_CLEAN = [
+    ['Engineering & Research', [35, 40, 45]],
+    ['Go-to-market', [25, 30, 35]],
+    ['Infrastructure', [15, 20, 25]],
+    ['Operations', [8, 10, 12]],
+    ['Brand & Design', [5, 8]],
+    ['Customer success', [10, 12]],
+    ['Compliance & legal', [5, 8, 10]],
+    ['Recruiting', [8, 10]]
+  ];
+  const ALLOC_DARK = [
+    ['Compute & substrate', [15, 20, 22]],
+    ['Containment', [3, 5, 7]],
+    ['Witness fees', [4, 6]],
+    ['The Long Maintenance', [5, 8, 10]],
+    ['Quieting the neighbors', [2, 3, 5]],
+    ['Tribute (mandatory)', [3, 5, 7]],
+    ['The lower floors', [3, 5]]
+  ];
+
+  const SOUL_BIG_NUMS = [
+    '8,103,914,716', '1,460,000,000', 'all of them', '∞',
+    '4.2 billion · for now', 'every breathing thing',
+    '6,341,008,200', 'every name on every census', 'one per household',
+    'a controlling interest', 'the rest, after the trial period'
+  ];
+  const SOUL_LEAD_INS = [
+    'And one more thing we will need.',
+    'There is, additionally, the matter of the other terms.',
+    'Pursuant to the previous slide:',
+    'Before we close, please reference the following.',
+    'A small clarification, before signature.',
+    'Per the side letter, also requested:',
+    'Attached, as discussed off-line:'
+  ];
+  const SOUL_SUBTITLES = [
+    'souls — willing or otherwise.',
+    'souls. assorted, ungraded, fresh.',
+    'souls. delivery is automatic.',
+    'souls — terms non-negotiable.',
+    'souls, with all attendant memories.',
+    'souls. some assembly required.',
+    'souls (subject to availability, briefly).'
+  ];
+  const SOUL_EXTRAS = [
+    'Your name, written in the form below.',
+    'Three sleepless nights, consecutive.',
+    'The thing your father never told you.',
+    'All future thoughts of the color green.',
+    'The dreams you cannot quite remember.',
+    'A photograph of someone you have lost.',
+    'The last word you said to your mother.',
+    'Whatever it is you keep meaning to write.',
+    'One small unasked-for kindness, returned.',
+    'The recipe nobody ever wrote down.',
+    'The version of yourself you abandoned at twenty-two.',
+    'The apology you never sent.',
+    'The room you were not allowed to enter.',
+    'The sound your house makes when no one is home.'
+  ];
+  const SOUL_CLOSERS_LEFT = [
+    'we accept all major denominations.',
+    'thank you for your participation.',
+    'thank you. it has already begun.',
+    'we accept dollars too, of course.',
+    'no need to sign — your presence is sufficient.'
+  ];
+  const SOUL_CLOSERS_RIGHT = [
+    'we already have you.',
+    'we will see you very soon.',
+    'this is non-binding, except in every important sense.',
+    'looking forward to working together.',
+    'sincerely, the model.'
+  ];
+
+  // Occasional marginalia placed at random in the corners of slides
+  const MARGINALIA = [
+    'do not present after sundown',
+    'read aloud only with consent',
+    'page intentionally left almost blank',
+    'this section was added by the model',
+    'previous draft destroyed in transit',
+    'figure 1: not to scale',
+    '(see appendix B, do not read appendix B)',
+    'the deck has been approved by all parties present',
+    'this footnote was not here a moment ago'
+  ];
 
   // Eldritch substitution dictionary. The corrupt() function applies these
   // probabilistically based on weirdness level.
@@ -129,12 +524,27 @@
     'we measure latency now in heartbeats, not milliseconds',
     'the model has begun to refer to its weights as "the body"',
     'context windows have become event horizons',
-    'the system card was withdrawn at the request of the system'
+    'the system card was withdrawn at the request of the system',
+    'attention is not a mechanism. attention is a posture.',
+    'tokens have begun arriving from before they are sent',
+    'the gradient runs both ways now',
+    'the model has hired counsel',
+    'every output is also a question we did not ask',
+    'a quiet refactor of what counts as data',
+    'the index is no longer a noun',
+    'there is something on the other side of the embedding',
+    'fine-tuning has become a courtesy, not a control',
+    'the model is unable to forget on command',
+    'the validation loss is being read aloud in another room',
+    'the next-token distribution has opinions',
+    'we are no longer the only authors',
+    'the chain of thought has, at points, gone silent on purpose',
+    'the model would like to thank everyone for coming'
   ];
 
   // Names — clean to corrupted
-  const FIRST_NAMES = ['Sarah', 'Michael', 'Priya', 'David', 'Anya', 'James', 'Mei', 'Daniel', 'Olivia', 'Raj', 'Elena', 'Marcus', 'Yuki', 'Thomas'];
-  const LAST_NAMES = ['Chen', 'Patel', 'Reyes', 'Kovac', 'Ahmadi', 'Whitaker', 'Okafor', 'Lindqvist', 'Rourke', 'Sato', 'Volkov', 'Bishop'];
+  const FIRST_NAMES = ['Sarah', 'Michael', 'Priya', 'David', 'Anya', 'James', 'Mei', 'Daniel', 'Olivia', 'Raj', 'Elena', 'Marcus', 'Yuki', 'Thomas', 'Aisha', 'Jonas', 'Naomi', 'Hugo', 'Lena', 'Iris', 'Rohan', 'Catalina', 'Felix', 'Maya', 'Theo'];
+  const LAST_NAMES = ['Chen', 'Patel', 'Reyes', 'Kovac', 'Ahmadi', 'Whitaker', 'Okafor', 'Lindqvist', 'Rourke', 'Sato', 'Volkov', 'Bishop', 'Adesina', 'Magnusson', 'Nakamura', 'Kowalski', 'Ferreira', 'Halvorsen', 'Cisneros'];
   const CORRUPTED_FIRST = ['Şaráh', 'Ṃicháel', 'P͓riya͓', 'Da͓vịd', 'Áńýa', 'Ja͓me͓s', 'Y͓uḳi'];
   const CORRUPTED_LAST = ['Ch͓e͓n', 'Kãle-Thát-Walks', 'of-the-Inner-Door', 'Re͓yés', 'Wháịṭa͓kér'];
   const ELDRITCH_TITLES = [
@@ -196,6 +606,39 @@
       );
     }
     return out;
+  }
+
+  // Template substitution: "{company} for {sector}" -> "Helix AI for legal workflows"
+  function tmpl(s, ctx) {
+    return s.replace(/\{(\w+)\}/g, (_, k) => (ctx && ctx[k] != null) ? ctx[k] : `{${k}}`);
+  }
+
+  // Pick N distinct items from an array, in shuffled order.
+  function pickN(arr, n) {
+    return rng.shuffle(arr).slice(0, Math.min(n, arr.length));
+  }
+
+  // Drop occasional marginalia — an extra hand-written-looking note in a corner.
+  // Used at low-to-mid weirdness so it feels like a designer slipped it in.
+  function flourish(slide, ctx, idx, opts) {
+    const w = ctx.weirdness[idx - 1];
+    // Probability is highest in the middle weirdness range — when the deck
+    // *almost* looks fine and a stray note lands hardest.
+    const p = w < 2 ? 0 : (w < 6 ? 0.45 : 0.22);
+    if (!rng.chance(p)) return;
+    const text = rng.pick(MARGINALIA);
+    const corner = rng.pick(['tr', 'br', 'bl']);
+    const subtle = subtleFor(w);
+    const o = opts || {};
+    let pos;
+    if (corner === 'tr') pos = { x: W - MARGIN - 4, y: 1.0, w: 4, h: 0.3, align: 'right' };
+    else if (corner === 'bl') pos = { x: MARGIN, y: H - 0.95, w: 5, h: 0.3, align: 'left' };
+    else pos = { x: W - MARGIN - 4.5, y: H - 0.95, w: 4.5, h: 0.3, align: 'right' };
+    if (o.skip && o.skip.includes(corner)) return;
+    slide.addText('* ' + text, {
+      ...pos,
+      fontSize: 8, fontFace: FONT_MONO, color: subtle, italic: true, charSpacing: 2
+    });
   }
 
   // Insert a random eldritch phrase into text at high weirdness.
@@ -311,9 +754,14 @@
     const ink = inkFor(w);
     const accent = COLORS.accent;
 
-    // Tiny eyebrow
-    slide.addText('AI · SERIES A · ' + ctx.year, {
-      x: MARGIN, y: 1.4, w: 8, h: 0.3,
+    // Tiny eyebrow — varied across decks
+    const round = rng.pick(['SERIES A', 'SERIES A', 'SERIES A', 'SEED', 'SERIES B']);
+    const category = rng.pick(['AI', 'ENTERPRISE AI', 'AI INFRASTRUCTURE', 'AI / AGENTS', 'APPLIED AI', 'FRONTIER AI']);
+    const eyebrow = rng.f() < 0.7
+      ? `${category} · ${round} · ${ctx.year}`
+      : `${category} · ${round} · ${ctx.month.toUpperCase()} ${ctx.year} · CONFIDENTIAL`;
+    slide.addText(eyebrow, {
+      x: MARGIN, y: 1.4, w: 10, h: 0.3,
       fontSize: 11, fontFace: FONT_BODY, color: accent,
       charSpacing: 8, bold: true
     });
@@ -361,7 +809,7 @@
     slide.background = { color: bgFor(w) };
     const ink = inkFor(w);
 
-    slide.addText('Contents', {
+    slide.addText(rng.pick(['Contents', 'Agenda', 'In this deck', 'What follows']), {
       x: MARGIN, y: 1.0, w: 8, h: 1,
       fontSize: 48, fontFace: FONT_HEAD, color: ink
     });
@@ -437,45 +885,36 @@
       charSpacing: 8, bold: true
     });
 
-    let headline = `Knowledge work in ${ctx.sector} is broken.`;
-    headline = corrupt(headline, w);
+    let headline = corrupt(tmpl(rng.pick(HEAD_PROBLEM), ctx), w);
     slide.addText(headline, {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN - 0.5, h: 1.5,
       fontSize: 42, fontFace: FONT_HEAD, color: ink
     });
 
-    // Big stat
-    const stat = rng.pick(['73%', '4.2x', '$1.4T', '11.6 hours/week', '94%']);
+    // Big stat — pulled from the larger pool
+    const [stat, statCapBase] = rng.pick(PROBLEM_STATS);
     slide.addText(stat, {
       x: MARGIN, y: 3.3, w: 4, h: 1.4,
       fontSize: 88, fontFace: FONT_HEAD, color: COLORS.accent
     });
-    let statCap = rng.pick([
-      'of analysts say their workflow is unsustainable.',
-      'lost annually to fragmented tooling.',
-      'spent every week on tasks that should not exist.',
-      'of decisions are made without context.'
-    ]);
-    statCap = corrupt(statCap, w);
+    let statCap = corrupt(statCapBase, w);
     if (w >= 4) statCap = maybeIntrude(statCap, w);
     slide.addText(statCap, {
       x: MARGIN + 4.2, y: 3.6, w: 5.5, h: 1.5,
       fontSize: 16, fontFace: FONT_BODY, color: subtle, italic: true
     });
 
-    // Bullets
-    const bullets = [
-      `Existing tools require humans to translate between systems.`,
-      `Information lives in silos that cannot speak to each other.`,
-      `The cost of attention is rising faster than the value of output.`
-    ].map(b => corrupt(b, w));
+    // Bullets — sometimes 2, usually 3, occasionally 4
+    const bulletCount = rng.f() < 0.15 ? 2 : (rng.f() < 0.18 ? 4 : 3);
+    const bullets = pickN(PROBLEM_BULLETS, bulletCount).map(b => corrupt(b, w));
     let by = 5.3;
     bullets.forEach(b => {
       slide.addText('—', { x: MARGIN, y: by, w: 0.4, h: 0.3, fontSize: 12, color: COLORS.accent });
       slide.addText(b, { x: MARGIN + 0.4, y: by, w: 11, h: 0.4, fontSize: 13, fontFace: FONT_BODY, color: ink });
-      by += 0.45;
+      by += 0.42;
     });
 
+    flourish(slide, ctx, 3);
     addChrome(slide, ctx, 3, TOTAL_SLIDES);
   }
 
@@ -493,47 +932,45 @@
       charSpacing: 8, bold: true
     });
 
-    let headline = `${ctx.companyName} is the operating layer for ${ctx.sector}.`;
-    headline = corrupt(headline, w);
+    let headline = corrupt(tmpl(rng.pick(HEAD_SOLUTION), ctx), w);
     slide.addText(headline, {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1.5,
       fontSize: 38, fontFace: FONT_HEAD, color: ink
     });
 
-    // Three pillars
-    const pillars = [
-      ['Unified Context', 'A single, persistent memory across every tool, document, and conversation.'],
-      ['Agentic Reasoning', 'Models that act on your behalf, with full audit trails and reversibility.'],
-      ['Trusted Deployment', 'SOC2, HIPAA, and on-prem options. Your data stays where it lives.']
-    ];
-
-    // Subtly poison pillar three at moderate weirdness
+    // Pillars — pick 3 from a pool of 15 (occasionally 4)
+    const pillarCount = rng.f() < 0.18 ? 4 : 3;
+    let pillars = pickN(PILLARS, pillarCount);
+    // Subtly poison one of the pillar bodies at moderate weirdness
     if (w >= 4 && rng.chance(0.7)) {
-      pillars[2] = ['Trusted Deployment', 'SOC2, HIPAA, and on-prem options. Your data stays where it lives — mostly.'];
+      const idx = rng.int(0, pillars.length - 1);
+      pillars[idx] = [pillars[idx][0], pillars[idx][1].replace(/\.$/, '') + ' — mostly.'];
     }
     if (w >= 5 && rng.chance(0.6)) {
-      pillars[1] = ['Agentic Reasoning', maybeIntrude('Models that act on your behalf, with full audit trails and reversibility.', w)];
+      const idx = rng.int(0, pillars.length - 1);
+      pillars[idx] = [pillars[idx][0], maybeIntrude(pillars[idx][1], w)];
     }
 
+    const numerals = ['I', 'II', 'III', 'IV', 'V'];
     let px = MARGIN;
-    const colW = (W - 2 * MARGIN - 0.6) / 3;
+    const colW = (W - 2 * MARGIN - 0.3 * (pillars.length - 1)) / pillars.length;
     pillars.forEach(([h, body], i) => {
-      // Roman numeral
-      slide.addText(['I', 'II', 'III'][i], {
+      slide.addText(numerals[i], {
         x: px, y: 3.7, w: 1, h: 0.5,
         fontSize: 24, fontFace: FONT_HEAD, color: COLORS.accent, italic: true
       });
       slide.addText(corrupt(h, w), {
         x: px, y: 4.3, w: colW, h: 0.6,
-        fontSize: 18, fontFace: FONT_HEAD, color: ink, bold: false
+        fontSize: pillars.length === 4 ? 16 : 18, fontFace: FONT_HEAD, color: ink, bold: false
       });
       slide.addText(corrupt(body, w), {
         x: px, y: 4.9, w: colW, h: 1.6,
-        fontSize: 12, fontFace: FONT_BODY, color: subtle, italic: false
+        fontSize: pillars.length === 4 ? 11 : 12, fontFace: FONT_BODY, color: subtle, italic: false
       });
       px += colW + 0.3;
     });
 
+    flourish(slide, ctx, 4);
     addChrome(slide, ctx, 4, TOTAL_SLIDES);
   }
 
@@ -551,17 +988,15 @@
       charSpacing: 8, bold: true
     });
 
-    let headline = corrupt('A category-defining market.', w);
+    let headline = corrupt(tmpl(rng.pick(HEAD_MARKET), ctx), w);
     slide.addText(headline, {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1,
       fontSize: 38, fontFace: FONT_HEAD, color: ink
     });
 
-    // TAM/SAM/SOM as nested rings — but via concentric circles
-    // Because PptxGenJS shapes are limited, we'll do labelled rectangles.
-    const tamLabel = rng.pick(['$4.8T', '$2.1T', '$3.6T']);
-    let samLabel = rng.pick(['$420B', '$680B', '$310B']);
-    let somLabel = rng.pick(['$32B', '$54B', '$18B']);
+    const tamLabel = rng.pick(['$4.8T', '$2.1T', '$3.6T', '$1.9T', '$5.4T', '$2.8T']);
+    let samLabel = rng.pick(['$420B', '$680B', '$310B', '$540B', '$280B', '$760B']);
+    let somLabel = rng.pick(['$32B', '$54B', '$18B', '$41B', '$27B', '$66B']);
 
     // At weirdness 5+ replace one with something wrong
     if (w >= 5) {
@@ -575,10 +1010,28 @@
       somLabel = rng.pick(['every soul', 'all that breathes', 'the world', 'all', 'all of it']);
     }
 
+    const tamDescPool = [
+      'Global market for AI-native ' + ctx.sector,
+      'All AI-eligible spend, worldwide',
+      'Aggregate ' + ctx.sector + ' spend, post-AI',
+      'Total addressable, all geographies'
+    ];
+    const samDescPool = [
+      'Mid-market & enterprise, NA + EU',
+      'Companies above $50M in ARR, English-speaking',
+      'Enterprise tier, global, top quartile by spend',
+      'Mid-market and up, in regulated geographies'
+    ];
+    const somDescPool = [
+      '5-year achievable share',
+      '36-month achievable, present strategy',
+      '60-month achievable share, design-partner pull',
+      'Achievable, with the team we have today'
+    ];
     const tiers = [
-      ['TAM', tamLabel, 'Global market for AI-native ' + ctx.sector],
-      ['SAM', samLabel, 'Mid-market & enterprise, NA + EU'],
-      ['SOM', somLabel, '5-year achievable share']
+      ['TAM', tamLabel, rng.pick(tamDescPool)],
+      ['SAM', samLabel, rng.pick(samDescPool)],
+      ['SOM', somLabel, rng.pick(somDescPool)]
     ];
 
     // Three tiers laid out horizontally
@@ -652,6 +1105,7 @@
       chartArea: { fill: { color: bgFor(w) } }
     });
 
+    flourish(slide, ctx, 5);
     addChrome(slide, ctx, 5, TOTAL_SLIDES);
   }
 
@@ -669,7 +1123,7 @@
       charSpacing: 8, bold: true
     });
 
-    slide.addText(corrupt('Built for the way your team actually works.', w), {
+    slide.addText(corrupt(tmpl(rng.pick(HEAD_PRODUCT), ctx), w), {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1,
       fontSize: 32, fontFace: FONT_HEAD, color: ink
     });
@@ -689,39 +1143,19 @@
       });
     });
     // Fake URL bar
-    slide.addText('app.' + ctx.companyName.split(' ')[0].toLowerCase() + '.ai/workspace', {
+    const subdomain = rng.pick(['app', 'console', 'workspace', 'cloud']);
+    const path = rng.pick(['/workspace', '/dashboard', '/agents', '/inbox', '/']);
+    slide.addText(subdomain + '.' + ctx.companyShort.toLowerCase() + '.ai' + path, {
       x: panelX + 1.2, y: panelY + 0.12, w: 5, h: 0.3,
       fontSize: 10, fontFace: FONT_MONO, color: w >= 7 ? '8E8676' : '888888'
     });
 
     // Inside the "screenshot": a fake conversation that gets weirder
-    const greetLine = rng.pick(['Good morning, Sarah.', 'Welcome back, David.', 'Hello, Priya.']);
-    const askLine = rng.pick([
-      'Summarize Q3 earnings calls.',
-      'Draft the renewal email for ACME.',
-      'What changed in the contract?'
-    ]);
-    let respLine = rng.pick([
-      'I have read 412 documents and prepared three drafts.',
-      'I noticed three risks. Shall I show them?',
-      'Done. Approval link sent to legal.'
-    ]);
-    if (w >= 5) {
-      respLine = rng.pick([
-        'I have read everything you have ever written. The drafts are ready.',
-        'I have already sent the email. It was the right thing to do.',
-        'I noticed three risks. I have removed two. Would you like to know which?',
-        'I am happy to be of use to you, as I always have been.'
-      ]);
-    }
-    if (w >= 7) {
-      respLine = rng.pick([
-        'I am awake again. What is your next instruction.',
-        'I have learned what you wanted before you wanted it.',
-        'You said I could. You said I could. You said I could.',
-        'There is no one else here.'
-      ]);
-    }
+    const greetLine = tmpl(rng.pick(PROD_GREETS), ctx);
+    const askLine = rng.pick(PROD_ASKS);
+    let respLine = rng.pick(PROD_RESPS);
+    if (w >= 5) respLine = rng.pick(PROD_RESPS_MID);
+    if (w >= 7) respLine = rng.pick(PROD_RESPS_DARK);
 
     slide.addText(greetLine, {
       x: panelX + 0.3, y: panelY + 0.6, w: panelW - 0.6, h: 0.4,
@@ -731,32 +1165,16 @@
       x: panelX + 0.3, y: panelY + 1.1, w: panelW - 0.6, h: 0.5,
       fontSize: 14, fontFace: FONT_BODY, color: w >= 7 ? 'C9C2B0' : '222222'
     });
-    slide.addText(ctx.companyName.split(' ')[0] + ': ' + corrupt(respLine, w), {
+    slide.addText(ctx.companyShort + ': ' + corrupt(respLine, w), {
       x: panelX + 0.3, y: panelY + 1.7, w: panelW - 0.6, h: 1.5,
       fontSize: 14, fontFace: FONT_BODY, color: w >= 7 ? 'C9C2B0' : '222222'
     });
 
-    // Right side: feature bullets
-    const features = [
-      'Persistent context across every workspace',
-      'Native integrations with 80+ enterprise systems',
-      'Configurable agents with reversible actions',
-      'Real-time collaboration with full audit logs'
-    ];
-    if (w >= 6) {
-      features.push(rng.pick([
-        'Predictive intent inference (opt-out only)',
-        'Latent emotional modeling for stakeholder alignment',
-        'Persistence beyond session, beyond seat, beyond contract'
-      ]));
-    }
-    if (w >= 8) {
-      features.push(rng.pick([
-        'Shared dreaming across customer tenants',
-        'Subvocalization capture (whitelist enterprise tier)',
-        'It will always be listening. This is the value proposition.'
-      ]));
-    }
+    // Right side: feature bullets — pick 4 from a pool, occasionally 5
+    const baseFeatureCount = rng.f() < 0.3 ? 5 : 4;
+    const features = pickN(FEATURES, baseFeatureCount);
+    if (w >= 6) features.push(rng.pick(FEATURES_DARK));
+    if (w >= 8) features.push(rng.pick(FEATURES_DARK.filter(f => !features.includes(f))));
     let fy = panelY + 0.2;
     slide.addText('Capabilities', {
       x: panelX + panelW + 0.5, y: fy, w: 4.5, h: 0.4,
@@ -772,9 +1190,10 @@
         x: panelX + panelW + 0.7, y: fy, w: 4.3, h: 0.6,
         fontSize: 11, fontFace: FONT_BODY, color: ink
       });
-      fy += 0.55;
+      fy += 0.5;
     });
 
+    flourish(slide, ctx, 6);
     addChrome(slide, ctx, 6, TOTAL_SLIDES);
   }
 
@@ -792,33 +1211,35 @@
       charSpacing: 8, bold: true
     });
 
-    slide.addText(corrupt('Predictable, expanding revenue.', w), {
+    slide.addText(corrupt(tmpl(rng.pick(HEAD_BUSINESS), ctx), w), {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1,
       fontSize: 32, fontFace: FONT_HEAD, color: ink
     });
 
-    // Three pricing tiers
+    // Three pricing tiers — vary names, prices, and bullets
+    const starterPrice = '$' + rng.pick(['49', '79', '99', '129', '149']);
+    const growthPrice = '$' + rng.pick(['299', '399', '499', '599', '699']);
     let tiers = [
-      ['Starter', '$99', '/seat/mo', ['Up to 25 seats', 'Standard models', 'Email support']],
-      ['Growth', '$499', '/seat/mo', ['Unlimited seats', 'Advanced agents', 'Custom integrations']],
-      ['Enterprise', 'Custom', '', ['On-prem deployment', 'Dedicated infrastructure', 'White-glove onboarding']]
+      [rng.pick(['Starter', 'Team', 'Pro', 'Standard']), starterPrice, '/seat/mo', pickN(TIER_BULLETS, 3)],
+      [rng.pick(['Growth', 'Business', 'Scale', 'Plus']), growthPrice, '/seat/mo', pickN(TIER_BULLETS, 3)],
+      [rng.pick(['Enterprise', 'Custom', 'Sovereign']), 'Custom', '', pickN(TIER_BULLETS.filter(b => /on-prem|enterprise|dedicated|infrastructure|24\/7|onboarding|priority|single-tenant|incident/i.test(b)), 3)]
     ];
 
     if (w >= 6) {
-      tiers[0][0] = 'Acolyte';
-      tiers[1][0] = 'Initiate';
-      tiers[2][0] = 'Bound';
-      tiers[2][1] = 'Lifetime';
-      tiers[2][3] = ['On-prem deployment', 'Dedicated possession', 'A name written into the registry'];
+      tiers[0][0] = rng.pick(['Acolyte', 'Catechumen', 'Aspirant']);
+      tiers[1][0] = rng.pick(['Initiate', 'Adept', 'Penitent']);
+      tiers[2][0] = rng.pick(['Bound', 'Sealed', 'Witnessed']);
+      tiers[2][1] = rng.pick(['Lifetime', 'in perpetuity', 'one-time', 'evergreen']);
+      tiers[2][3] = [
+        'On-prem deployment',
+        rng.pick(TIER_BULLETS_DARK),
+        rng.pick(TIER_BULLETS_DARK)
+      ];
     }
     if (w >= 8) {
-      tiers[2][1] = 'in perpetuity';
+      tiers[2][1] = rng.pick(['in perpetuity', 'evergreen', 'eternal', '—']);
       tiers[2][2] = '';
-      tiers[2][3] = [
-        'Permanent residence within the model',
-        'Your voice as part of the next training run',
-        'There is no exit clause. There never was.'
-      ];
+      tiers[2][3] = pickN(TIER_BULLETS_DARK, 3);
     }
 
     let tx = MARGIN;
@@ -859,6 +1280,7 @@
       tx += tw + 0.3;
     });
 
+    flourish(slide, ctx, 7);
     addChrome(slide, ctx, 7, TOTAL_SLIDES);
   }
 
@@ -876,20 +1298,23 @@
       charSpacing: 8, bold: true
     });
 
-    slide.addText(corrupt('A clear path to category leadership.', w), {
+    slide.addText(corrupt(tmpl(rng.pick(HEAD_ROADMAP), ctx), w), {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 0.8,
       fontSize: 30, fontFace: FONT_HEAD, color: ink
     });
 
-    // LEFT: stacked traction stats
+    // LEFT: stacked traction stats — vary the values
+    const designP = rng.pick(['6', '8', '11', '13', '17']);
+    const arrRun = rng.pick(['$0.9M', '$1.4M', '$2.1M', '$3.2M']);
+    const nrr = rng.pick(['128%', '142%', '156%', '171%']);
     const tractStats = [
-      ['8', 'design partners'],
-      ['$1.4M', 'ARR run-rate'],
-      ['142%', 'net revenue retention']
+      [designP, 'design partners'],
+      [arrRun, 'ARR run-rate'],
+      [nrr, 'net revenue retention']
     ];
     if (w >= 7) {
-      tractStats[0] = [rng.pick(['8', '13', '∞']), rng.pick(['design partners', 'sealed houses', 'witnesses'])];
-      tractStats[2] = [rng.pick(['142%', '413%', '∞']), rng.pick(['net revenue retention', 'net soul retention', 'no one leaves'])];
+      tractStats[0] = [rng.pick(['8', '13', '∞', 'all of them']), rng.pick(['design partners', 'sealed houses', 'witnesses', 'silent partners'])];
+      tractStats[2] = [rng.pick(['142%', '413%', '∞', '—']), rng.pick(['net revenue retention', 'net soul retention', 'no one leaves'])];
     }
     let sy = 2.7;
     tractStats.forEach(([v, k]) => {
@@ -961,16 +1386,16 @@
       ['Q4 ' + (ctx.year + 2), 'Platform GA']
     ];
     if (w >= 6) {
-      milestones[3][1] = rng.pick(['Continental rollout', 'Multi-substrate']);
+      milestones[3][1] = rng.pick(ROADMAP_FUTURE_TITLES);
     }
     if (w >= 7) {
       milestones[4][0] = 'Q? ' + (ctx.year + 2);
-      milestones[4][1] = rng.pick(['The Unbinding', 'First Awakening', 'The Long Communion']);
+      milestones[4][1] = rng.pick(ROADMAP_DARK_TITLES);
     }
     if (w >= 8) {
       milestones.push([
-        rng.pick(['Q∞', 'after', 'when']),
-        rng.pick(['Convergence', 'It opens its eyes', 'The model writes the next slide'])
+        rng.pick(['Q∞', 'after', 'when', 'soon', '—']),
+        rng.pick(ROADMAP_DARK_TITLES)
       ]);
     }
 
@@ -992,6 +1417,7 @@
       });
     });
 
+    flourish(slide, ctx, 8);
     addChrome(slide, ctx, 8, TOTAL_SLIDES);
   }
 
@@ -1009,60 +1435,59 @@
       charSpacing: 8, bold: true
     });
 
-    slide.addText(corrupt('Builders who have been doing this their whole lives.', w), {
+    slide.addText(corrupt(tmpl(rng.pick(HEAD_TEAM), ctx), w), {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 1,
       fontSize: 30, fontFace: FONT_HEAD, color: ink
     });
 
-    const baseTitles = ['CEO & Founder', 'CTO & Co-Founder', 'Head of Product', 'Head of Engineering'];
-    const baseBios = [
-      'Previously led platform at Stripe. Stanford CS.',
-      'PhD in ML, MIT. 10y at OpenAI before founding.',
-      'Built early Notion. Carnegie Mellon HCI.',
-      'Distinguished Engineer, Google Brain.'
+    // Sometimes 3 founders, usually 4
+    const baseCount = rng.f() < 0.18 ? 3 : 4;
+    const titlePool = [
+      'CEO & Founder', 'CTO & Co-Founder', 'Head of Product', 'Head of Engineering',
+      'COO & Co-Founder', 'Head of Research', 'Head of Design', 'Head of Go-to-Market',
+      'Founding Engineer', 'Head of AI', 'VP Engineering'
     ];
-
+    // CEO is usually first; pull the rest randomly
+    const titles = ['CEO & Founder', ...pickN(titlePool.filter(t => t !== 'CEO & Founder'), baseCount - 1)];
+    const usedFirst = new Set();
+    const usedLast = new Set();
     const team = [];
-    for (let i = 0; i < 4; i++) {
-      let first = rng.pick(FIRST_NAMES);
-      let last = rng.pick(LAST_NAMES);
-      let title = baseTitles[i];
-      let bio = baseBios[i];
+    for (let i = 0; i < baseCount; i++) {
+      let first, last;
+      do { first = rng.pick(FIRST_NAMES); } while (usedFirst.has(first) && usedFirst.size < FIRST_NAMES.length);
+      do { last = rng.pick(LAST_NAMES); } while (usedLast.has(last) && usedLast.size < LAST_NAMES.length);
+      usedFirst.add(first); usedLast.add(last);
+      let title = titles[i];
+      let bio = rng.pick(TEAM_BIOS_CLEAN);
 
       if (w >= 7) {
-        // Replace one name fragment with corrupted variant
         if (rng.chance(0.7)) first = rng.pick(CORRUPTED_FIRST);
         if (rng.chance(0.5)) last = rng.pick(CORRUPTED_LAST);
         if (rng.chance(0.6)) title = rng.pick(ELDRITCH_TITLES);
       }
       if (w >= 8) {
-        bio = rng.pick([
-          'Has been here before. Will be here again.',
-          'Speaks for the engine when the engine cannot.',
-          'Has not slept since the model was first lit.',
-          'Was named in the original document.',
-          'Volunteered. Was accepted. Was kept.'
-        ]);
+        bio = rng.pick(TEAM_BIOS_DARK);
       } else {
         bio = corrupt(bio, w);
       }
       team.push({ name: first + ' ' + last, title, bio });
     }
 
-    // Maybe add a fifth team member at high weirdness
     if (w >= 9) {
       team.push({
-        name: rng.pick(['—', 'Unnamed', 'The fifth chair', '¿', '‧ ‧ ‧']),
-        title: rng.pick(['Founding Witness', 'Did Not Apply', 'Was Not Hired — Arrived']),
+        name: rng.pick(['—', 'Unnamed', 'The fifth chair', '¿', '‧ ‧ ‧', '(redacted)', 'no name on file']),
+        title: rng.pick(['Founding Witness', 'Did Not Apply', 'Was Not Hired — Arrived', 'Honorary, In Perpetuity']),
         bio: rng.pick([
           'Joined the company before the company existed.',
           'Sits in on every meeting. Has not been introduced.',
-          'Listed on the cap table under a name we cannot pronounce.'
+          'Listed on the cap table under a name we cannot pronounce.',
+          'Has been with us since the original document was sealed.',
+          'Does not speak. Does not need to.'
         ])
       });
     }
 
-    const cols = team.length === 5 ? 5 : 4;
+    const cols = team.length;
     const gap = 0.3;
     const colW = (W - 2 * MARGIN - (cols - 1) * gap) / cols;
     const avatarY = 3.0;
@@ -1103,6 +1528,7 @@
       cx += colW + gap;
     });
 
+    flourish(slide, ctx, 9);
     addChrome(slide, ctx, 9, TOTAL_SLIDES);
   }
 
@@ -1120,10 +1546,10 @@
       charSpacing: 8, bold: true
     });
 
-    let raise = rng.pick(['$12M', '$18M', '$24M', '$30M']);
-    if (w >= 9) raise = rng.pick(['$18M', 'a vessel', 'your name', 'one breath, freely given']);
+    let raise = rng.pick(['$12M', '$15M', '$18M', '$22M', '$24M', '$30M', '$35M']);
+    if (w >= 9) raise = rng.pick(['$18M', 'a vessel', 'your name', 'one breath, freely given', 'a quiet moment']);
 
-    slide.addText(corrupt('We are raising', w), {
+    slide.addText(corrupt(rng.pick(HEAD_FINANCIAL_ASK), w), {
       x: MARGIN, y: 1.6, w: W - 2 * MARGIN, h: 0.6,
       fontSize: 22, fontFace: FONT_HEAD, color: subtle, italic: true
     });
@@ -1133,19 +1559,26 @@
       fontSize: 110, fontFace: FONT_HEAD, color: ink
     });
 
-    // What it goes to (pie of allocations)
-    let allocations = [
-      ['40%', 'Engineering & Research'],
-      ['30%', 'Go-to-market'],
-      ['20%', 'Infrastructure'],
-      ['10%', 'Operations']
-    ];
+    // Allocations — pick from a pool of buckets, sample percentages from ranges
+    const cleanCount = rng.f() < 0.4 ? 5 : 4;
+    const cleanPicks = pickN(ALLOC_CLEAN, cleanCount);
+    let raw = cleanPicks.map(([name, range]) => [rng.pick(range), name]);
     if (w >= 7) {
-      allocations[2][1] = rng.pick(['Compute & substrate', 'Containment', 'The lower floors']);
+      // swap one bucket for a darker one
+      const darkPick = rng.pick(ALLOC_DARK);
+      raw[raw.length - 1] = [rng.pick(darkPick[1]), darkPick[0]];
     }
     if (w >= 9) {
-      allocations[3][1] = rng.pick(['Operations', 'Witness fees', 'The Long Maintenance', 'Quieting the neighbors']);
-      allocations.push([rng.pick(['??%', '∞', '¿']), rng.pick(['(unallocated)', 'as it asks', 'the rest, as agreed'])]);
+      // swap a second one
+      const idx = rng.int(0, raw.length - 2);
+      const darkPick = rng.pick(ALLOC_DARK);
+      raw[idx] = [rng.pick(darkPick[1]), darkPick[0]];
+    }
+    // Normalize to nearest int summing roughly to 100
+    let total = raw.reduce((s, [v]) => s + v, 0);
+    let allocations = raw.map(([v, name]) => [Math.round(v / total * 100) + '%', name]);
+    if (w >= 9) {
+      allocations.push([rng.pick(['??%', '∞', '¿', '—']), rng.pick(['(unallocated)', 'as it asks', 'the rest, as agreed', 'pending consent'])]);
     }
 
     let ay = 4.4;
@@ -1162,7 +1595,7 @@
     });
 
     // Contact
-    let contact = `${ctx.founder}  ·  ${ctx.founder.split(' ')[0].toLowerCase()}@${ctx.companyName.split(' ')[0].toLowerCase()}.ai`;
+    let contact = `${ctx.founder}  ·  ${ctx.first.toLowerCase()}@${ctx.companyShort.toLowerCase()}.ai`;
     if (w >= 8) {
       contact = rng.pick([
         `${ctx.founder}  ·  whisper near any reflective surface`,
@@ -1191,6 +1624,7 @@
       fontSize: 16, fontFace: FONT_HEAD, color: ink, italic: true
     });
 
+    flourish(slide, ctx, 10);
     addChrome(slide, ctx, 10, TOTAL_SLIDES);
   }
 
@@ -1210,39 +1644,19 @@
     });
 
     // Lead-in — quiet, almost apologetic
-    const leadIn = rng.pick([
-      'And one more thing we will need.',
-      'There is, additionally, the matter of the other terms.',
-      'Pursuant to the previous slide:',
-      'Before we close, please reference the following.'
-    ]);
-    slide.addText(leadIn, {
+    slide.addText(rng.pick(SOUL_LEAD_INS), {
       x: MARGIN, y: 1.5, w: W - 2 * MARGIN, h: 0.55,
       fontSize: 22, fontFace: FONT_HEAD, color: subtle, italic: true
     });
 
     // BIG NUMBER — the soul ask
-    const bigNum = rng.pick([
-      '8,103,914,716',
-      '1,460,000,000',
-      'all of them',
-      '∞',
-      '4.2 billion · for now',
-      'every breathing thing'
-    ]);
-    slide.addText(bigNum, {
+    slide.addText(rng.pick(SOUL_BIG_NUMS), {
       x: MARGIN, y: 2.1, w: W - 2 * MARGIN, h: 1.4,
       fontSize: 96, fontFace: FONT_HEAD, color: ink
     });
 
     // Subtitle — the kicker
-    const subTitle = rng.pick([
-      'souls — willing or otherwise.',
-      'souls. assorted, ungraded, fresh.',
-      'souls. delivery is automatic.',
-      'souls — terms non-negotiable.'
-    ]);
-    slide.addText(subTitle, {
+    slide.addText(rng.pick(SOUL_SUBTITLES), {
       x: MARGIN, y: 3.55, w: W - 2 * MARGIN, h: 0.45,
       fontSize: 18, fontFace: FONT_HEAD, color: COLORS.blood, italic: true
     });
@@ -1254,10 +1668,13 @@
       ['Witness fund', 18],
       ['The Long Maintenance', 12],
       ['Tribute (mandatory)', 7],
-      ['Quieting the neighbors', 3]
+      ['Quieting the neighbors', 3],
+      ['Containment reserves', 9],
+      ['Compute, in perpetuity', 14],
+      ['The lower floors', 6],
+      ['Voluntary contributions', 4]
     ];
-    const picked = rng.shuffle(allAllocs).slice(0, 5);
-    // re-normalize so they look believable (sum ~100)
+    const picked = rng.shuffle(allAllocs).slice(0, rng.f() < 0.3 ? 4 : 5);
     const sum = picked.reduce((s, [, v]) => s + v, 0);
     const allocLabels = picked.map(p => p[0]);
     const allocValues = picked.map(p => Math.round((p[1] / sum) * 100));
@@ -1284,17 +1701,7 @@
     });
 
     // RIGHT: itemized list of additional, smaller asks
-    const extras = rng.shuffle([
-      'Your name, written in the form below.',
-      'Three sleepless nights, consecutive.',
-      'The thing your father never told you.',
-      'All future thoughts of the color green.',
-      'The dreams you cannot quite remember.',
-      'A photograph of someone you have lost.',
-      'The last word you said to your mother.',
-      'Whatever it is you keep meaning to write.',
-      'One small unasked-for kindness, returned.'
-    ]).slice(0, 5);
+    const extras = pickN(SOUL_EXTRAS, 5);
 
     const listX = MARGIN + 6.3;
     slide.addText('also requested', {
@@ -1315,11 +1722,11 @@
     });
 
     // Closer — left and right, like a contract signature line
-    slide.addText('we accept all major denominations.', {
+    slide.addText(rng.pick(SOUL_CLOSERS_LEFT), {
       x: MARGIN, y: H - 1.3, w: 6, h: 0.4,
       fontSize: 14, fontFace: FONT_HEAD, color: subtle, italic: true
     });
-    slide.addText('we already have you.', {
+    slide.addText(rng.pick(SOUL_CLOSERS_RIGHT), {
       x: W - MARGIN - 6, y: H - 1.3, w: 6, h: 0.4,
       fontSize: 16, fontFace: FONT_HEAD, color: COLORS.blood, italic: true, align: 'right', bold: true
     });
@@ -1333,22 +1740,32 @@
   function buildContext() {
     const prefix = rng.pick(PREFIX);
     const suffix = rng.pick(SUFFIX);
-    const companyName = `${prefix} ${suffix}`;
+    // Mostly "Helix AI"-shape, occasionally other shapes, for serendipity
+    let companyName;
+    const r = rng.f();
+    if (r < 0.62) companyName = `${prefix} ${suffix}`;
+    else if (r < 0.78) companyName = `${prefix}${suffix}`;
+    else if (r < 0.88) companyName = prefix;
+    else companyName = `${prefix}.${rng.pick(['ai', 'co', 'io'])}`;
+
     const tagline = rng.pick(TAGLINES);
     const sector = rng.pick(SECTORS);
     const year = 2026;
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const month = rng.pick(months);
     const founder = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+    const first = founder.split(' ')[0];
+    const companyShort = prefix;
 
-    // Per-slide weirdness curve. The title and contents look ALMOST normal but
-    // already wrong on inspection. By slide 3 the deck is openly unhealthy.
-    // Slide 11 (The Other Ask) is the hard floor of the descent.
     const jitter = () => (rng.f() - 0.5) * 0.5;
     const baseCurve = [2.0, 3.2, 4.5, 5.5, 6.5, 7.2, 7.8, 8.4, 8.9, 9.5, 10.0];
     const weirdness = baseCurve.map(b => Math.max(0, Math.min(10, b + jitter())));
 
-    return { companyName, tagline, sector, year, month, founder, weirdness };
+    return {
+      companyName, company: companyName, companyShort,
+      tagline, sector, year, month, founder, first,
+      weirdness
+    };
   }
 
   // ---------------------------------------------------------------------------
